@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Fast, minimal URL shortener. Create clean, shareable links in seconds.">
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg>">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Brand / Header -->
+    <header class="app-header">
+      <div class="brand">
+        <svg class="brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+        <h1 class="brand-title">URL Shortener</h1>
+      </div>
+      <p class="brand-subtitle">Create clean, shareable links with click tracking.</p>
+    </header>
+
+    <!-- Main Content Flow -->
+    <main class="app-main">
+      <!-- Primary Card: Create Short URL -->
+      <section class="card primary-card" aria-label="Shorten link section">
+        <form id="shorten-form" class="shorten-form" novalidate>
+          <div class="form-group">
+            <label for="original-url" class="form-label">Destination URL</label>
+            <input 
+              type="url" 
+              id="original-url" 
+              name="original_url" 
+              class="form-input input-lg" 
+              placeholder="https://example.com/your/very/long/url" 
+              required
+              autocomplete="off"
+              spellcheck="false"
+            >
+          </div>
+
+          <!-- Advanced Options (Collapsible) -->
+          <details class="advanced-disclosure" id="advanced-options">
+            <summary class="advanced-summary">
+              <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+              <span>Advanced options</span>
+            </summary>
+            
+            <div class="advanced-body">
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="custom-alias" class="form-label">
+                    Custom alias <span class="label-optional">optional</span>
+                  </label>
+                  <div class="input-affix-wrapper">
+                    <span class="input-affix">/</span>
+                    <input 
+                      type="text" 
+                      id="custom-alias" 
+                      name="custom_alias" 
+                      class="form-input" 
+                      placeholder="custom-link" 
+                      maxlength="32"
+                      autocomplete="off"
+                      spellcheck="false"
+                    >
+                  </div>
+                  <span class="form-help">3–32 letters, numbers, _, -</span>
+                </div>
+
+                <div class="form-group flex-1">
+                  <label for="expires-at" class="form-label">
+                    Expiration <span class="label-optional">optional</span>
+                  </label>
+                  <input 
+                    type="datetime-local" 
+                    id="expires-at" 
+                    name="expires_at" 
+                    class="form-input"
+                  >
+                  <span class="form-help">Leaves active permanently if empty</span>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div class="form-submit-row">
+            <button type="submit" id="btn-submit" class="btn btn-primary">
+              <span class="btn-spinner hidden" aria-hidden="true"></span>
+              <span class="btn-text">Create short URL</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Inline Error Alert -->
+        <div id="shorten-error" class="alert alert-error hidden" role="alert"></div>
+
+        <!-- Result Section (Appears cleanly below form) -->
+        <div id="result-card" class="result-card hidden" aria-live="polite">
+          <div class="result-card-header">
+            <span class="result-badge">Link ready</span>
+            <button type="button" id="btn-shorten-another" class="btn-subtle-action">Shorten another</button>
+          </div>
+
+          <div class="result-url-row">
+            <input type="text" id="result-short-url" class="result-url-field" readonly spellcheck="false">
+            <button type="button" id="btn-copy-result" class="btn btn-copy" title="Copy to clipboard">
+              <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <svg class="check-icon hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="copy-btn-text">Copy</span>
+            </button>
+          </div>
+
+          <dl class="result-meta-list">
+            <div class="result-meta-item">
+              <dt class="meta-label">Target URL</dt>
+              <dd class="meta-value"><a id="result-orig-url" href="#" target="_blank" rel="noopener noreferrer" class="link-external truncate"></a></dd>
+            </div>
+            <div class="result-meta-item">
+              <dt class="meta-label">Clicks</dt>
+              <dd class="meta-value" id="result-clicks">0</dd>
+            </div>
+            <div class="result-meta-item">
+              <dt class="meta-label">Expires</dt>
+              <dd class="meta-value" id="result-expires">Never</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- Secondary Card: Link Inspector / Stats -->
+      <section class="card secondary-card" aria-labelledby="stats-heading">
+        <div class="secondary-card-header">
+          <h2 id="stats-heading" class="secondary-title">Inspect a short link</h2>
+          <p class="secondary-description">Check real-time clicks and metadata or remove an existing link.</p>
+        </div>
+
+        <form id="lookup-form" class="lookup-form" novalidate>
+          <div class="lookup-input-row">
+            <div class="input-affix-wrapper flex-1">
+              <span class="input-affix">/</span>
+              <input 
+                type="text" 
+                id="lookup-code" 
+                name="lookup_code" 
+                class="form-input" 
+                placeholder="e.g. a8Kx2 or my-link" 
+                required
+                autocomplete="off"
+                spellcheck="false"
+              >
+            </div>
+            <button type="submit" id="btn-lookup" class="btn btn-secondary">
+              <span class="btn-spinner hidden" aria-hidden="true"></span>
+              <span class="btn-text">View stats</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Stats Error Alert -->
+        <div id="lookup-error" class="alert alert-error hidden" role="alert"></div>
+
+        <!-- Stats Data View -->
+        <div id="stats-view" class="stats-view hidden" aria-live="polite">
+          <div class="stats-metrics-strip">
+            <div class="metric-card">
+              <span class="metric-title">Total Clicks</span>
+              <span class="metric-val" id="stats-clicks">0</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-title">Link Status</span>
+              <span class="status-indicator" id="stats-status">Active</span>
+            </div>
+          </div>
+
+          <dl class="stats-info-table">
+            <div class="stats-info-row">
+              <dt class="stats-label">Short link</dt>
+              <dd class="stats-value-action">
+                <a id="stats-short-url" href="#" target="_blank" class="link-accent truncate"></a>
+                <button type="button" id="btn-copy-stats" class="btn-inline-copy">Copy</button>
+              </dd>
+            </div>
+            <div class="stats-info-row">
+              <dt class="stats-label">Destination</dt>
+              <dd class="stats-value">
+                <a id="stats-orig-url" href="#" target="_blank" rel="noopener noreferrer" class="link-external truncate"></a>
+              </dd>
+            </div>
+            <div class="stats-info-row">
+              <dt class="stats-label">Created</dt>
+              <dd class="stats-value" id="stats-created">—</dd>
+            </div>
+            <div class="stats-info-row">
+              <dt class="stats-label">Expires</dt>
+              <dd class="stats-value" id="stats-expires">—</dd>
+            </div>
+          </dl>
+
+          <!-- Delete Action Bar (Inline confirmation, no intrusive popup) -->
+          <div class="stats-delete-wrapper">
+            <div id="delete-initial-view">
+              <button type="button" id="btn-start-delete" class="btn btn-danger-ghost">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Delete this short link</span>
+              </button>
+            </div>
+
+            <div id="delete-confirm-view" class="delete-confirmation-banner hidden">
+              <span class="delete-confirmation-text">Are you sure? This link will permanently stop working.</span>
+              <div class="delete-confirmation-actions">
+                <button type="button" id="btn-cancel-delete" class="btn btn-secondary btn-sm">Cancel</button>
+                <button type="button" id="btn-confirm-delete" class="btn btn-danger btn-sm">
+                  <span class="btn-spinner hidden" aria-hidden="true"></span>
+                  <span class="btn-text">Confirm Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Minimal Footer -->
+    <footer class="app-footer">
+      <p>URL Shortener &bull; Built with Node.js, Express &amp; SQLite</p>
+    </footer>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
